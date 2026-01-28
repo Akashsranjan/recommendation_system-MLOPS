@@ -1,0 +1,6 @@
+outs:
+- md5: d3c38809a2fc8a9862c706807d75deed.dir
+  size: 54817176
+  nfiles: 1
+  hash: md5
+  path: model
