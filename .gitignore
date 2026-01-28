@@ -1,0 +1,9 @@
+mlops/
+artifacts/raw/
+artifacts/processed/
+artifacts/model/
+artifacts/model_checkpoint/
+artifacts/weights/
+MLOPS_PROJECT_2.egg-info/
+logs/
+__pycache__/
