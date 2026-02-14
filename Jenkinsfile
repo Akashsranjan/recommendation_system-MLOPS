@@ -2,27 +2,34 @@ pipeline {
     agent any
 
     environment {
-        VENV_DIR = 'venv'
-        GCP_PROJECT = 'mlops-new-447207'
+        VENV_DIR ='venv'
+        GCP_PROJECT = 'mlops-474603'
         GCLOUD_PATH = "/var/jenkins_home/google-cloud-sdk/bin"
         KUBECTL_AUTH_PLUGIN = "/usr/lib/google-cloud-sdk/bin"
     }
 
-    stages{
-
-        stage("Cloning from Github...."){
-            steps{
-                script{
-                    echo 'Cloning from Github...'
-                    checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'github-token', url: 'https://github.com/data-guru0/MLOPS-COURSE-PROJECT-2.git']])
+    stages {
+        stage("cloning from github") {
+            steps {
+                script {
+                    echo 'Cloning from GitHub...'
+                    checkout scmGit(
+                        branches: [[name: '*/main']],
+                        extensions: [],
+                        userRemoteConfigs: [[
+                            credentialsId: 'github-token-anime',
+                            url: 'https://github.com/Akashsranjan/recommendation_system-MLOPS.git'
+                        ]]
+                    )
                 }
             }
         }
 
-        stage("Making a virtual environment...."){
-            steps{
-                script{
-                    echo 'Making a virtual environment...'
+
+        stage("making a virtual environment.....") {
+            steps {
+                script {
+                    echo 'making a virtual environment.....'
                     sh '''
                     python -m venv ${VENV_DIR}
                     . ${VENV_DIR}/bin/activate
@@ -30,16 +37,16 @@ pipeline {
                     pip install -e .
                     pip install  dvc
                     '''
+                    
                 }
             }
         }
 
-
-        stage('DVC Pull'){
+        stage("DVC Pull"){
             steps{
                 withCredentials([file(credentialsId:'gcp-key' , variable: 'GOOGLE_APPLICATION_CREDENTIALS' )]){
                     script{
-                        echo 'DVC Pul....'
+                        echo 'DVC Pull....'
                         sh '''
                         . ${VENV_DIR}/bin/activate
                         dvc pull
@@ -49,14 +56,13 @@ pipeline {
             }
         }
 
-
         stage('Build and Push Image to GCR'){
             steps{
                 withCredentials([file(credentialsId:'gcp-key' , variable: 'GOOGLE_APPLICATION_CREDENTIALS' )]){
                     script{
-                        echo 'Build and Push Image to GCR'
+                        echo 'DVC Pul....'
                         sh '''
-                        export PATH=$PATH:${GCLOUD_PATH}
+                          export PATH=$PATH:${GCLOUD_PATH}
                         gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS}
                         gcloud config set project ${GCP_PROJECT}
                         gcloud auth configure-docker --quiet
@@ -67,7 +73,6 @@ pipeline {
                 }
             }
         }
-
 
         stage('Deploying to Kubernetes'){
             steps{
